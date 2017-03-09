@@ -1,13 +1,13 @@
 // This test written in mocha+should.js
-var should = require('./init.js');
+var should = require("./init.js");
 
 var db, Model;
 
-describe('datatypes', function() {
+describe("datatypes", function() {
 
     before(function(done){
         db = getSchema();
-        Model = db.define('Model', {
+        Model = db.define("Model", {
             str: String,
             date: Date,
             num: Number,
@@ -18,11 +18,11 @@ describe('datatypes', function() {
         });
     });
 
-    it('should keep types when get read data from db', function(done) {
+    it("should keep types when get read data from db", function(done) {
         var d = new Date, id;
 
         Model.create({
-            str: 'hello', date: d, num: '3', bool: 1
+            str: "hello", date: d, num: "3", bool: 1
         }, function(err, m) {
             should.not.exist(err);
             should.exist(m && m.id);
@@ -41,7 +41,7 @@ describe('datatypes', function() {
                 m.num.should.be.a.Number;
                 m.bool.should.be.a.Boolean;
                 m.date.should.be.an.instanceOf(Date);
-                m.date.toString().should.equal(d.toString(), 'Time must match');
+                m.date.toString().should.equal(d.toString(), "Time must match");
                 next();
             });
         }
@@ -54,15 +54,15 @@ describe('datatypes', function() {
                 m.num.should.be.a.Number;
                 m.bool.should.be.a.Boolean;
                 m.date.should.be.an.instanceOf(Date);
-                m.date.toString().should.equal(d.toString(), 'Time must match');
+                m.date.toString().should.equal(d.toString(), "Time must match");
                 done();
             });
         }
 
     });
 
-    it('should convert "false" to false for boolean', function() {
-        var m = new Model({bool: 'false'});
+    it("should convert \"false\" to false for boolean", function() {
+        var m = new Model({bool: "false"});
         m.bool.should.equal(false);
     });
 

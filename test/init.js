@@ -1,14 +1,16 @@
-module.exports = require('should');
+module.exports = require("should");
 
-var Schema = require('jugglingdb').Schema;
+var Schema = require("loopback-datasource-juggler").Schema;
 
-global.getSchema = function() {
-    var db = new Schema(require('../'), {
-        host: 'localhost',
-        port: '8000',
-        logLevel: 'info'
+global.getSchema = function () {
+    var db = new Schema(require("../"), {
+        host: "localhost",
+        port: "8000",
+        logLevel: "info"
     });
-    db.log = function (a) { console.log(a); };
+    db.log = function (a) {
+        console.log(a);
+    };
 
     return db;
 };
