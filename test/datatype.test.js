@@ -8,53 +8,61 @@ describe("datatypes", function() {
     before(function(done){
         db = getSchema();
         Model = db.define("Model", {
+            id: {
+                type: String,
+                id: 1,
+                keyType: "hash"
+            },
             str: String,
-            date: Date,
             num: Number,
             bool: Boolean
         });
         db.adapter.emitter.on("created-model", function() {
             Model.destroyAll(done);
         });
+        done();
     });
 
     it("should keep types when get read data from db", function(done) {
-        var d = new Date, id;
 
         Model.create({
-            str: "hello", date: d, num: "3", bool: 1
+           id: "123", str: "hello", num: "3", bool: 1
         }, function(err, m) {
             should.not.exist(err);
             should.exist(m && m.id);
             m.str.should.be.a.String;
             m.num.should.be.a.Number;
             m.bool.should.be.a.Boolean;
-            id = m.id;
+            var realm = m.realm;
+            var id = m.id;
             testFind(testAll);
         });
 
         function testFind(next) {
-            Model.find(id, function(err, m) {
+            var query = {};
+            query.where = {};
+            query.where.id = "123";
+
+            Model.find(query, function(err, m) {
                 should.not.exist(err);
                 should.exist(m);
-                m.str.should.be.a.String;
-                m.num.should.be.a.Number;
-                m.bool.should.be.a.Boolean;
-                m.date.should.be.an.instanceOf(Date);
-                m.date.toString().should.equal(d.toString(), "Time must match");
+                m[0].str.should.be.a.String;
+                m[0].num.should.be.a.Number;
+                m[0].bool.should.be.a.Boolean;
                 next();
             });
         }
 
         function testAll() {
-            Model.findOne(function(err, m) {
+            var query = {};
+            query.where = {};
+            query.where.id = "123";
+            Model.findOne(query, function(err, m) {
                 should.not.exist(err);
                 should.exist(m);
                 m.str.should.be.a.String;
                 m.num.should.be.a.Number;
                 m.bool.should.be.a.Boolean;
-                m.date.should.be.an.instanceOf(Date);
-                m.date.toString().should.equal(d.toString(), "Time must match");
                 done();
             });
         }
