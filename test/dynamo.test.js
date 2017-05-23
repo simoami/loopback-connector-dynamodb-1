@@ -31,7 +31,7 @@ describe("dynamodb", function(){
 
         Car = db.define("Car", {
             doors: {type: Number},
-            licensePlate: { type: String, keyType: "hash"}
+            licensePlate: { type: String, id: 1, keyType: "hash"}
         });
 
         var modelCount = 0;
@@ -51,26 +51,13 @@ describe("dynamodb", function(){
         done();
     });
 
-    beforeEach(function(done){
-        Book.destroyAll(function(){
-            Car.destroyAll(function(){
-                Cookie.destroyAll(function(){
-                    User.destroyAll(done);
-                });
-            });
-        });
-        done();
-    });
-
-   
-
-
 /*
  ONLY HASH KEYS
  */
 
     describe("if model only has a hash key", function() {
         // Does not Currently assign hash key if none is specified, must be manually specified 
+
         it("should assign a hash key if not specified", function(done){
             Cookie.create({ color: "brown", recipe: "Bake it nice n soft" }, function(err, cookie){
                 should.not.exist(err);
@@ -90,14 +77,15 @@ describe("dynamodb", function(){
             done();
         });
 
-        it("should should fetch based on hash key", function(done){
-            User.find("1", function(err, user){
+        it("should fetch based on hash key", function(done){
+            User.find({where: {realm: "users"}}, function(err, user){
                 should.not.exist(err);
-                should.exist.user;
+                user.should.exist;
                 done();
             });
         });
-
+        // Dynamodb connector currently does not implement this by design, as things can be created with just a hashkey provided, but would require a sortkey.
+        // TODO: Bring our connector to parity with loopback.
         it("should assign same value as hash key to id attribute", function(done){
             Car.create({licensePlate: "XXYY-112", doors: 4}, function(err, car){
                 should.not.exist(err);
@@ -189,36 +177,15 @@ describe("dynamodb", function(){
 
     describe("if model has hash and range keys", function(){
 
-        it("should use separator specified in schema definition", function(done){
-            var book = new Book({
-                ida: "abcd",
-                subject: "Nature"
-            });
-            Book.create(book, function (err, _book){
-                _book.should.have.property("id","abcd--oo--Nature");
-                done();
-            });
-        });
-
-        it("should throw error id attribute is missing", function(done){
-            (function() {
-                db.define("Model", {
-                    attribute1 : { type: String, keyType: "hash"},
-                    attribute2 : { type: Number, keyType: "sort"}
-                });
-            }).should.throw();
-            done();
-        });
-
         it("should find objects with id attribute", function(done){
             var book = new Book({
-                ida: "bca",
+                id: "bca",
                 subject: "Wildlife"
             });
             Book.create(book, function (e, b){
-                Book.find(b.id, function (err, fetchedBook){
-                    fetchedBook.ida.should.eql("bca");
-                    fetchedBook.subject.should.eql("Wildlife");
+                Book.find({where: {subject: "Wildlife", id: "bca"}}, function (err, fetchedBook){
+                    fetchedBook[0].id.should.eql("bca");
+                    fetchedBook[0].subject.should.eql("Wildlife");
                     done();
                 });
             });
@@ -226,16 +193,16 @@ describe("dynamodb", function(){
 
         it("should handle breakable attribute for hash and sort key combination", function(done){
             var book = new Book({
-                ida: "abc",
+                id: "abc",
                 subject : "Freaky",
                 essay : "He's dead Jim."
             });
             Book.create(book, function(e, b){
                 should.not.exist(e);
-                Book.find(b.id, function(err, fetchedBook){
-                    fetchedBook.essay.should.eql("He's dead Jim.");
-                    fetchedBook.ida.should.eql("abc");
-                    fetchedBook.subject.should.eql("Freaky");
+                Book.find({where: {subject: "Freaky", essay: "He's dead Jim."}}, function(err, fetchedBook){
+                    fetchedBook[0].essay.should.eql("He's dead Jim.");
+                    fetchedBook[0].id.should.eql("abc");
+                    fetchedBook[0].subject.should.eql("Freaky");
                     done();
                 });
             });
@@ -244,25 +211,25 @@ describe("dynamodb", function(){
     // Check if rangekey is supported
         it("should create two books for same id but different subjects", function (done) {
             var book1 = new Book({
-                ida: "abcd",
+                id: "abcd",
                 subject: "Nature"
             });
 
             var book2 = new Book({
-                ida: "abcd",
+                id: "abcd",
                 subject: "Fiction"
             });
 
             Book.create(book1, function (err, _book1) {
                 should.not.exist(err);
                 should.exist(_book1);
-                _book1.should.have.property("ida", "abcd");
+                _book1.should.have.property("id", "abcd");
                 _book1.should.have.property("subject", "Nature");
 
                 Book.create(book2, function (err, _book2) {
                     should.not.exist(err);
                     should.exist(_book2);
-                    _book2.should.have.property("ida", "abcd");
+                    _book2.should.have.property("id", "abcd");
                     _book2.should.have.property("subject", "Fiction");
                     done();
                 });

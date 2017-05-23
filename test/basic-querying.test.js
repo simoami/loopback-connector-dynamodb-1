@@ -46,7 +46,7 @@ describe('basic-querying', function() {
     describe('find', function() {
 
         before(function(done) {
-            done();
+                done();
         });
 
         it('should query by id without keys: Error out', function(done) {
@@ -64,7 +64,6 @@ describe('basic-querying', function() {
             query.where.role = "leaders";
             query.where.order = "25";
             User.find(query, function(err, u) {
-                should.exist([]);
                 should.exist(u);
                 should.not.exist(err);
                 done();

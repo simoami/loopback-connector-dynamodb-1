@@ -12,17 +12,34 @@ describe("hooks", function() {
 
     before(function(done) {
         db = getSchema();
-
-        User = db.define("User", {
-            email: {type: String, index: true, limit: 100},
-            name: String,
-            password: String,
-            state: String
+         User = db.define('User', {
+            realm: {
+                type: String,
+                id: 1,
+                keyType: "hash",
+                limit: 100
+            },
+            role: {
+                type: String,
+                sort: true,
+                limit: 100
+            },
+            id: {
+                type: String,
+                id: 2,
+                keyType: "sort"
+            },
+            username: {
+                type: String,
+            },
+            order: {
+                type: Number,
+                sharding: true,
+                splitter: "10kb"
+            }
         });
 
-        db.adapter.emitter.on("created-user", function(){
-            done();
-        });
+        done();
     });
 
     describe("behavior", function() {
@@ -56,15 +73,15 @@ describe("hooks", function() {
         });
 
         it("should be triggered on create", function(done) {
-            var user;
+            
             User.afterInitialize = function() {
                 if (this.name === "Nickolay") {
                     this.name += " Rozental";
                 }
             };
-            User.create({name: "Nickolay"}, function(err, u) {
-                u.id.should.be.ok;
-                u.name.should.equal("Nickolay Rozental");
+            User.create({realm: "users", id: "123", username: "Nickolay"}, function(err, u) {
+                u[0].id.should.be.ok;
+                u[0].username.should.equal("Nickolay Rozental");
                 done();
             });
         });
