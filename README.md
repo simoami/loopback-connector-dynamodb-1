@@ -1,17 +1,3 @@
----
-title: "DynamoDB connector"
-lang: en
-toc: false
-keywords:
-source: loopback-connector-dynamodb
-tags: [community]
-sidebar: community_sidebar
-permalink: /doc/en/community/dynamo-connector.html
----
-
-## Link
-
-[https://github.com/mandarzope/loopback-connector-dynamodb](https://github.com/mandarzope/loopback-connector-dynamodb)
 
 ## Overview
 
