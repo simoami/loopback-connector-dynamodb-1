@@ -1,4 +1,5 @@
-
+# DynamoDB Connector for Loopback  
+[![codecov](https://codecov.io/gh/SwipeX/PokeMate/branch/master/graph/badge.svg)](https://codecov.io/gh/UnisonoInc/loopback-connector-dynamodb)
 ## Overview
 
 DynamoDB Connector for loopback (compitable with datasource-juggler) 
