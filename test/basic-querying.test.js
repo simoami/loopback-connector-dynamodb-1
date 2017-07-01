@@ -35,7 +35,7 @@ describe('basic-querying', function() {
                 splitter: "10kb"
             }
         });
-            
+
         db.adapter.emitter.on("created-user", function() {
             User.destroyAll(done);
         });
@@ -46,7 +46,7 @@ describe('basic-querying', function() {
     describe('find', function() {
 
         before(function(done) {
-                done();
+            done();
         });
 
         it('should query by id without keys: Error out', function(done) {
@@ -77,13 +77,13 @@ describe('basic-querying', function() {
             query.where.id = "1";
 
             var aUser = [{
-            realm: "beatles",
-            id: '1',
-            username: 'John Lennon',
-            email: 'john@b3atl3s.co.uk',
-            role: 'leaders',
-            order: '2',
-            tasks: 'Sing me a song'
+                realm: "beatles",
+                id: '1',
+                username: 'John Lennon',
+                email: 'john@b3atl3s.co.uk',
+                role: 'leaders',
+                order: '2',
+                tasks: 'Sing me a song'
             }];
 
             User.create(aUser, function(err, u) {
@@ -102,7 +102,7 @@ describe('basic-querying', function() {
             });
         });
 
-         it('should query by id: found', function(done) {
+        it('should query by id: found', function(done) {
             var query = {};
             query.where = {};
             query.where.realm = "beatles";
@@ -118,7 +118,7 @@ describe('basic-querying', function() {
                 order: '2',
                 tasks: 'Sing me a song'
             }];
-        
+
             User.create(aUser, function(err, u) {
                 should.not.exist(err);
                 should.exist(u[0].id);
@@ -140,7 +140,7 @@ describe('basic-querying', function() {
         before(seed);
 
         it('should query collection', function(done) {
-            User.all({where: { realm: "beatles" }}, function(err, users) {
+            User.all({ where: { realm: "beatles" } }, function(err, users) {
                 should.exists(users);
                 should.not.exists(err);
                 users.should.have.lengthOf(6);
@@ -189,9 +189,9 @@ describe('basic-querying', function() {
 
         it('should query collection sorted by numeric field', function(done) {
             User.all({
-                 where: {
+                where: {
                     realm: "beatles"
-                 },
+                },
                 order: 'order'
             }, function(err, users) {
                 should.exists(users);
@@ -207,7 +207,7 @@ describe('basic-querying', function() {
             User.all({
                 where: {
                     realm: "beatles"
-                 },
+                },
                 order: 'order DESC'
             }, function(err, users) {
                 should.exists(users);
@@ -223,7 +223,7 @@ describe('basic-querying', function() {
             User.all({
                 where: {
                     realm: "beatles"
-                 },
+                },
                 order: 'username'
             }, function(err, users) {
                 should.exists(users);
@@ -239,7 +239,7 @@ describe('basic-querying', function() {
             User.all({
                 where: {
                     realm: "beatles"
-                 },
+                },
                 order: 'username DESC'
             }, function(err, users) {
                 should.exists(users);
@@ -259,8 +259,8 @@ describe('basic-querying', function() {
 
         it('should query total count', function(done) {
             User.count({
-                    realm: "beatles"
-                 }, function(err, n) {
+                realm: "beatles"
+            }, function(err, n) {
                 should.not.exist(err);
                 should.exist(n);
                 n.should.equal(6);
@@ -381,7 +381,7 @@ function seed(done) {
         }
     ];
 
-    User.destroyAll( function() {
+    User.destroyAll(function() {
         beatles.forEach(function(beatle) {
             User.create(beatle, ok);
         });
