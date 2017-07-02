@@ -280,6 +280,21 @@ describe('basic-querying', function() {
             });
         });
     });
+    describe('Or Operator', () => {
+        before(seed);
+        it('should work with or operator', (done) => {
+            User.count({ realm: "beatles", or: [{ role: "leaders" }, { order: 5 }] })
+                .then(users => {
+                    should.exist(users);
+                    users.should.equal(3);
+                    done();
+                })
+                .catch( (err) => {
+                    should.not.exist(err);
+                    done();
+                });
+        });
+    });
 
     describe('findOne', function() {
 

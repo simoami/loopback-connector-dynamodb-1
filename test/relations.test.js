@@ -47,7 +47,6 @@ describe("relations", function() {
             b.users.should.be.an.instanceOf(Function);
             b.authors.should.be.an.instanceOf(Function);
             (new Chapter).toObject().should.have.property("bookId");
-            console.log((new Chapter).toObject());
             (new Author).toObject().should.have.property("projectId");
             db.automigrate(done);
         });
@@ -62,9 +61,7 @@ describe("relations", function() {
 
         it("should build record on scope", function(done) {
             Book.create(function(err, book) {
-                console.log(book);
                 var c = book.chapters.build();
-                console.log(c);
                 c.bookId.should.equal(book.id);
                 c.save(done);
             });
