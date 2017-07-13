@@ -6,9 +6,9 @@ var db, Book, Chapter, Author, Reader;
 describe("relations", function() {
     before(function(done) {
         db = getSchema();
-        Book = db.define("Book", { id: { type: String, id: 1, keyType: "hash", uuid: true } });
-        Chapter = db.define("Chapter", { id: { type: String, index: true, id: 1, keyType: "hash", uuid: true, limit: 20 } });
-        Author = db.define("Author", { id: { type: String, id: 1, keyType: "hash", uuid: true } });
+        Book = db.define("Book", { id: { type: String, id: 1, keyType: "hash" } });
+        Chapter = db.define("Chapter", { id: { type: String, index: true, id: 1, keyType: "hash", limit: 20 } });
+        Author = db.define("Author", { id: { type: String, id: 1, keyType: "hash" } });
 
         Reader = db.define("Reader", {
             id: { type: String, id: 1, keyType: "hash", uuid: true }
@@ -60,16 +60,16 @@ describe("relations", function() {
         });
 
         it("should build record on scope", function(done) {
-            Book.create(function(err, book) {
-                var c = book.chapters.build();
+            Book.create({id: "book"}, function(err, book) {
+                var c = book.chapters.build({id: "chap"});
                 c.bookId.should.equal(book.id);
                 c.save(done);
             });
         });
 
         it("should create record on scope", function(done) {
-            Book.create(function(err, book) {
-                book.chapters.create(function(err, c) {
+            Book.create({id: "book"}, function(err, book) {
+                book.chapters.create({id: "chap"},function(err, c) {
                     should.not.exist(err);
                     should.exist(c);
                     c.bookId.should.equal(book.id);
@@ -80,7 +80,7 @@ describe("relations", function() {
 
         it("should find scoped record", function(done) {
             var id;
-            Book.create(function(err, book) {
+            Book.create({id: "book"}, function(err, book) {
                 book.chapters.create({ id: "a" }, function(err, ch) {
                     id = ch.id;
                     book.chapters.create({ id: "z" }, function() {
@@ -92,7 +92,7 @@ describe("relations", function() {
             });
 
             function fetch(book) {
-                book.chapters.find(id, function(err, ch) {
+                book.chapters.findOne({ where: { id: id}}, function(err, ch) {
                     should.not.exist(err);
                     should.exist(ch);
                     ch.id.should.equal(id);
@@ -102,13 +102,13 @@ describe("relations", function() {
         });
 
         it("should destroy scoped record", function(done) {
-            Book.create(function(err, book) {
+            Book.create({id: "book"}, function(err, book) {
                 book.chapters.create({ id: "a" }, function(err, ch) {
                     book.chapters.destroy(ch.id, function(err) {
                         should.not.exist(err);
-                        book.chapters.find(ch.id, function(err, ch) {
+                        book.chapters.findById(ch.id, function(err, ch) {
                             should.exist(err);
-                            err.message.should.equal("Not found");
+                            err.message.should.equal("No instance with id a found for Chapter");
                             should.not.exist(ch);
                             done();
                         });
@@ -144,10 +144,10 @@ describe("relations", function() {
 
         before(function(done) {
             var modelCount = 0;
-            List = db.define("List", { id: String });
-            Item = db.define("Item", { id: String });
-            Fear = db.define("Fear");
-            Mind = db.define("Mind");
+            List = db.define("List", { id: { type: String, id: 1, keyType: "hash" } });
+            Item = db.define("Item", { id: { type: String, id: 1, keyType: "hash" } });
+            Fear = db.define("Fear", { id: { type: String, id: 1, keyType: "hash" } });
+            Mind = db.define("Mind", { id: { type: String, id: 1, keyType: "hash" } });
 
             // syntax 1 (old)
             Item.belongsTo(List);
@@ -158,7 +158,7 @@ describe("relations", function() {
             Fear.belongsTo("mind");
             (new Fear).toObject().should.have.property("mindId");
             (new Fear).mind.should.be.an.instanceOf(Function);
-            // (new Fear).mind.build().should.be.an.instanceOf(Mind);
+            (new Fear).mind.build().should.be.an.instanceOf(Mind);
 
 
             db.adapter.emitter.on("created", function() {
@@ -174,7 +174,7 @@ describe("relations", function() {
                     });
                 }
             });
-
+            done();
         });
 
         it("can be used to query data", function(done) {
@@ -217,8 +217,8 @@ describe("relations", function() {
         var Article, Tag, ArticleTag;
         before(function(done) {
             var modelCount = 0;
-            Article = db.define("Article", { title: String });
-            Tag = db.define("Tag", { id: String });
+            Article = db.define("Article", { title: { type: String, id: 1, keyType: "hash" } });
+            Tag = db.define("Tag", { id: { type: String, id: 1, keyType: "hash" } });
             Article.hasAndBelongsToMany("tags");
             ArticleTag = db.models.ArticleTag;
             db.adapter.emitter.on("created", function() {
