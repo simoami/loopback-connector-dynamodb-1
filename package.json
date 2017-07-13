@@ -12,7 +12,7 @@
     "async": "latest",
     "aws-sdk": "latest",
     "bluebird": "^3.4.7",
-    "colors": "latest",
+    "colors": "^1.1.2",
     "debug": "^2.6.1",
     "depd": "^1.1.0",
     "inflection": "^1.12.0",
