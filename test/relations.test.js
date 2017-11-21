@@ -117,15 +117,15 @@ describe("relations", function() {
             });
         });
 
-        it("should not allow destroy not scoped records", function(done) {
-            Book.create(function(err, book1) {
-                book1.chapters.create({ id: "a" }, function(err, ch) {
+        it("should not allow destruction of none scoped records", function(done) {
+            Book.create({id: "book1"}, function(err, book1) {
+                book1.chapters.create({ id: "book1chapter1" }, function(err, ch) {
                     var id = ch.id;
-                    Book.create(function(err, book2) {
+                    Book.create({id: "book2"}, function(err, book2) {
                         book2.chapters.destroy(ch.id, function(err) {
                             should.exist(err);
-                            err.message.should.equal("Permission denied");
-                            book1.chapters.find(ch.id, function(err, ch) {
+                            err.message.should.equal(`No instance with id ${id} found for Chapter`);
+                            book1.chapters.findById(ch.id, function(err, ch) {
                                 should.not.exist(err);
                                 should.exist(ch);
                                 ch.id.should.equal(id);
@@ -180,10 +180,10 @@ describe("relations", function() {
         it("can be used to query data", function(done) {
             List.hasMany("todos", { model: Item });
             db.automigrate(function() {
-                List.create(function(e, list) {
+                List.create({ id: "List1" }, function(e, list) {
                     should.not.exist(e);
                     should.exist(list);
-                    list.todos.create(function(err, todo) {
+                    list.todos.create({ id: "Todos1" }, function(err, todo) {
                         todo.list(function(e, l) {
                             should.not.exist(e);
                             should.exist(l);
@@ -197,10 +197,10 @@ describe("relations", function() {
         });
 
         it("could accept objects when creating on scope", function(done) {
-            List.create(function(e, list) {
+            List.create({ id: "List2" }, function(e, list) {
                 should.not.exist(e);
                 should.exist(list);
-                Item.create({ list: list }, function(err, item) {
+                Item.create({list: list }, function(err, item) {
                     should.not.exist(err);
                     should.exist(item);
                     should.exist(item.listId);
